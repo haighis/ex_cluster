@@ -1,21 +1,30 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ex-cluster
+  name: ex-cluster-deployment
+  labels:
+    app: ex-cluster
 spec:
-  replicas: 2
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ex-cluster
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 34%
+      maxUnavailable: 34%
   template:
     metadata:
+      name: ex-cluster
       labels:
         app: ex-cluster
     spec:
       containers:
-        - name: ex-cluster
-          # the same name and tag must be used when building the image
-          image: ex_cluster:local
-          # use Never so the image is grabbed locally, for demo purposes
-          imagePullPolicy: Never
-          env:
+      - name: ex-cluster
+        image: ex_cluster:local
+        imagePullPolicy: Never
+        env:
             - name: MY_POD_IP
               valueFrom:
                 fieldRef:
